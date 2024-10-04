@@ -1,22 +1,17 @@
 import { Router } from "express";
 //TODO: import controllers
+import { getAllBlogs, getOneBlog, createBlog, editBlog, deleteBlog } from "../controllers/blog.controller";
 
 const router = Router();
 
-router.get("/post", (req, res) => {
-  res.send("Endpoint to get all posts");
-})
+router.get("/post", getAllBlogs)
 
-router.post("/post", (req, res) => {
-    res.send("endpoint to create a post");
-})
+router.get("/post/:id", getOneBlog)
 
-router.patch("/post/:id", (req, res) => {
-    res.send("endpoint to update a post");
-})
+router.post("/post", createBlog)
 
-router.delete("/post/:id", (req, res) => {
-    res.send("endpoint to delete a post");
-})
+router.patch("/post/:id", editBlog)
+
+router.delete("/post/:id", deleteBlog)
 
 export default router;
