@@ -35,7 +35,14 @@ const createBlog = async (req: Request, res: Response) => {
 }
 
 const editBlog = (req: Request, res: Response) => {
-    res.send('Edit blog')
+    try {
+        const data = req.body;
+        const id: string = req.params.id;
+        const blog = BlogService.editBlog(id, data);
+        res.status(200).json(blog);
+    } catch (error) {
+        res.status(500).json(error);
+    }
 }
 
 const deleteBlog = (req: Request, res: Response) => {

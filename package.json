@@ -6,7 +6,7 @@
   "author": "Samuel Adonay Ortiz Carballo <00023020@uca.edu.sv>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts"
   },
   "dependencies": {
     "@prisma/client": "5.20.0",
