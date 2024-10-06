@@ -46,7 +46,13 @@ const editBlog = (req: Request, res: Response) => {
 }
 
 const deleteBlog = (req: Request, res: Response) => {
-    res.send('Delete blog')
+    try {
+        const id: string = req.params.id;
+        BlogService.deleteBlog(id);
+        res.status(200).json('Blog deleted');
+    } catch (error) {
+        res.status(500).json(error);
+    }
 }
 
 export { getAllBlogs, getOneBlog, createBlog, editBlog, deleteBlog }
