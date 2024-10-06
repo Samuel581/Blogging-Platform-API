@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//BLOG table
+//Line 19 is how relations are made to other BDs, in other words PKs
+model Blog {
+  id         String    @id @default(uuid()) @db.Uuid()
+  title      String    @unique @db.VarChar(255)
+  content    String
+  categoryId Int?
+  tags       Tag[]     @relation("BlogTags") // Defines a many-to-many relation directly with Tag
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Category   Category? @relation(fields: [categoryId], references: [id])
+}
+
+
+model Tag {
+  id      Int     @id @default(autoincrement())
+  tagName String  @db.VarChar(255)
+  blogs   Blog[]  @relation("BlogTags") // Defines a many-to-many relation directly with Blog
+}
+
+model Category {
+  id           Int    @id @default(autoincrement())
+  categoryName String @db.VarChar(255)
+  blogs        Blog[]
+}
