@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { connect } from "http2";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -12,11 +11,7 @@ export const getBlogs = async () => {
         // Include category (ID and name)
         Category: true,
         // Include list of tags(ID and name) related to the blog
-        tags: {          
-          include: {
-            tag: true,   
-          },
-        },
+        tags: true,
       },
     }
   );
@@ -31,13 +26,10 @@ export const getBlog = async (id: string) => {
           },
           include: {
             Category: true,
-            tags: {          
-              include: {
-                tag: true,   
-              },
+            tags: true,
             },
           },
-  });
+        );
   return blog;
 };
 
@@ -62,35 +54,56 @@ export const createBlog = async (data: {
       // Nested data fields
       tags: {
         // Create new BlotTag entries for each tag on the request
-        create: tagIds?.map((tagId: number) => ({
-          // Connect each BlogTag to an existing tag
-          tag: {
-            connect: { id: tagId }
-          }
-        })) || [],
+       // Directly connect existing tags to the new Blog
+       connect: tagIds?.map((tagId: number) => ({
+        id: tagId,
+      })) || [],
       },
     },
     // Include the category and tags in the response
     include: {
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
+      tags: true,
       Category: true,
     },
   });
   return newBlog;
 };
   
+// Partial is a TypeScript utility type that makes all properties of an object optional
+export const editBlog = async (id: string, data: Partial<{
+  tittle: string;
+  content: string;
+  categoryId: number;
+  tagIds: number[];
+}>) => {
 
-export const editBlog = async (id: string, data: any) => {
-    return await prisma.blog.update({
-        where: {
-        id: id
-        },
-        data: data
-    });
+  // Pass the data from the request to start building the object and the prisma query
+  const updateData: Prisma.BlogUpdateInput = {};
+
+  if(data.tittle !== undefined) updateData.title = data.tittle;
+  if(data.content !== undefined) updateData.content = data.content;
+
+  if(data.categoryId !== undefined){
+    updateData.Category = {
+      connect: {id: data.categoryId}
+    }
+  }
+
+  if (data.tagIds !== undefined) {
+    updateData.tags = {
+      set: data.tagIds.map((tagId) => ({
+        id: tagId, // Replace all current tags with the provided tags
+      })),
+    };
+  }
+
+
+  return await prisma.blog.update({
+    where: {
+    id: id
+      },
+      data: data
+  });
 }
 
 export const deleteBlog = async (id: string) => {
