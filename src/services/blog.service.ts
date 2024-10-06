@@ -80,15 +80,23 @@ export const editBlog = async (id: string, data: Partial<{
   // Pass the data from the request to start building the object and the prisma query
   const updateData: Prisma.BlogUpdateInput = {};
 
+  //CHecking each element if has data from the request, if not it will not be included in the updateData object
   if(data.tittle !== undefined) updateData.title = data.tittle;
   if(data.content !== undefined) updateData.content = data.content;
 
+  // Check if the categoryId is present in the request, if it is, include it in the updateData object
+  // This relation is one-to-many so we use the connect key to connect the blog to the category 
+  // It connects the blog id into the category that is provied in the request
   if(data.categoryId !== undefined){
     updateData.Category = {
       connect: {id: data.categoryId}
     }
   }
 
+  // Check if the tagIds is present in the request, if it is, include it in the updateData object
+  // Warning: this will replace all the current tags with the provided tags
+  // This relation is many-to-many, we iterate the list of tags provided and connect one by one to the respective id on the many to many table
+  // See schema.prisma file for more information
   if (data.tagIds !== undefined) {
     updateData.tags = {
       set: data.tagIds.map((tagId) => ({
@@ -97,13 +105,17 @@ export const editBlog = async (id: string, data: Partial<{
     };
   }
 
-
-  return await prisma.blog.update({
+  const updatedBlog = await prisma.blog.update({
     where: {
     id: id
       },
-      data: data
+      data: updateData,
+      include: {
+        Category: true,
+        tags: true,
+      },
   });
+  return `Blog ${id} updated successfully`;
 }
 
 export const deleteBlog = async (id: string) => {
