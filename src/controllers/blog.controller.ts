@@ -20,7 +20,7 @@ const getOneBlog = async (req: Request, res: Response) => {
         res.status(200).json(blog)
     }
     catch(err){
-        res.status(500).json(`Something went wrong with error: ${error}`)
+        res.status(404).json(`Blog not found: ${error}`)
     }
 }
 
@@ -41,7 +41,7 @@ const editBlog = (req: Request, res: Response) => {
         const blog = BlogService.editBlog(id, data);
         res.status(200).json(blog);
     } catch (error) {
-        res.status(500).json(error);
+        res.status(404).json(`Blog not found: ${error}`);
     }
 }
 
