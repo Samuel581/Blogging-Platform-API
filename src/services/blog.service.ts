@@ -42,7 +42,7 @@ export const createBlog = async (data: {
 }) => {
   // Destructure the data object
   const { title, content, categoryId, tagIds } = data;
-  
+    
   // Prisma query to create a new blog
   const newBlog = await prisma.blog.create({
     // Define the data that will be passed to the query
